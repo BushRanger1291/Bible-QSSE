@@ -1,0 +1,10 @@
+{
+  "name": "Bible QSSE – Bureau mobile",
+  "short_name": "Bible QSSE",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#111827",
+  "description": "Bibliothèque QSSE locale orientée tablette"
+}
