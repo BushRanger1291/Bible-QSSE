@@ -1,25 +1,19 @@
 {
-  "id": "./",
+  "id": "/Bible-QSSE/",
   "name": "Bible QSSE",
   "short_name": "Bible QSSE",
   "description": "Bibliothèque QSSE locale pour tablette",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/Bible-QSSE/",
+  "scope": "/Bible-QSSE/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0b1220",
   "theme_color": "#111827",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "/Bible-QSSE/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icon-512.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
       "purpose": "any"
     }
   ]
