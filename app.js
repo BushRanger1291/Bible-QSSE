@@ -22,4 +22,33 @@ ui.addFiles.onclick=async()=>{try{if(await requireWrite())ui.files.click()}catch
 ui.files.onchange=async()=>{const files=[...ui.files.files];ui.files.value='';if(!files.length)return;let added=0,failed=0;for(const file of files){try{const name=file.name;try{await current().getFileHandle(name);if(!confirm(`« ${name} » existe déjà. Le remplacer ?`))continue}catch(error){if(error.name!=='NotFoundError')throw error}const handle=await current().getFileHandle(name,{create:true});const stream=await handle.createWritable();await stream.write(file);await stream.close();added++}catch(error){failed++;message(`Import impossible pour « ${file.name} » : ${readableError(error)}`)}}if(!failed)message(`${added} document(s) ajouté(s).`);await render()};
 $('#choose').onclick=choose;ui.up.onclick=()=>{if(trail.length){trail.pop();render()}};ui.search.oninput=()=>render();$('#foldersToggle').onclick=()=>{const panel=$('#folderPanel');panel.classList.toggle('open');$('#foldersToggle').setAttribute('aria-expanded',String(panel.classList.contains('open')))};
 (async()=>{if(!window.showDirectoryPicker){message('Ouvre cette application dans Chrome ou Edge sur HTTPS pour accéder à un dossier local.');render();return}try{const saved=await recalled();if(saved){root=saved;if(await permission(root)){message('Dossier précédent retrouvé.');await render()}else{root=null;message('Sélectionne à nouveau ton dossier pour autoriser son accès.');render()}}else render()}catch(error){message(readableError(error));render()}})();
-if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+let installPrompt=null;
+const installButton=$('#install');
+const installHelp=$('#installHelp');
+const standalone=window.matchMedia('(display-mode: standalone)');
+installButton.hidden=standalone.matches;
+window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();
+  installPrompt=event;
+  installButton.hidden=false;
+  installButton.textContent='Installer maintenant';
+});
+window.addEventListener('appinstalled',()=>{
+  installPrompt=null;
+  installButton.hidden=true;
+  installHelp.close();
+  message('Bible QSSE est installée.');
+});
+installButton.onclick=async()=>{
+  if(!installPrompt){installHelp.showModal();return}
+  const prompt=installPrompt;
+  installPrompt=null;
+  installButton.textContent='Installer l’application';
+  try{await prompt.prompt();await prompt.userChoice}
+  catch(error){installHelp.showModal()}
+};
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js?v=7',{updateViaCache:'none'}).catch(()=>{
+    message('Le mode hors connexion n’est pas disponible. Recharge la page avec une connexion Internet.');
+  });
+}
