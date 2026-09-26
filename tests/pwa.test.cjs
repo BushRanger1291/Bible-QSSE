@@ -27,7 +27,7 @@ function worker(overrides = {}) {
   });
   return events;
 }
-test('install refreshes every shell asset, including both new icons', async () => {
+test('install refreshes every shell asset, including the v10 PDF reader', async () => {
   let requests, pending;
   const events = worker({caches:{open:async()=>({addAll:async values=>requests=values})}});
   events.install({waitUntil:promise=>pending=promise});
@@ -37,17 +37,18 @@ test('install refreshes every shell asset, including both new icons', async () =
     const filename = new URL(request.url).pathname.replace('/Bible-QSSE/','');
     assert.ok(fs.existsSync(path.join(root, filename)),filename);
   }
+  assert.ok(requests.some(request=>request.url.endsWith('pdf-viewer-v10.js?v=10')));
   assert.ok(requests.some(request=>request.url.endsWith('skull-512-v7.png')));
 });
 test('activation preserves other applications caches', async () => {
   const deleted=[];let pending;
-  const events=worker({caches:{keys:async()=>['bible-qsse-v4','bible-qsse-v6','bible-qsse-v9','orion-v1'],delete:async key=>deleted.push(key)}});
+  const events=worker({caches:{keys:async()=>['bible-qsse-v4','bible-qsse-v9','bible-qsse-v10','orion-v1'],delete:async key=>deleted.push(key)}});
   events.activate({waitUntil:promise=>pending=promise});await pending;
-  assert.deepEqual(deleted,['bible-qsse-v4','bible-qsse-v6']);
+  assert.deepEqual(deleted,['bible-qsse-v4','bible-qsse-v9']);
 });
 test('offline navigation with a query string returns the cached application', async () => {
   let pending;
-  const events=worker({fetch:async()=>{throw new Error('offline')},caches:{match:async key=>{assert.equal(key,'https://example.com/Bible-QSSE/index.html?v=9');return new Response('offline shell')}}});
-  events.fetch({request:{url:'https://example.com/Bible-QSSE/?v=9',method:'GET',mode:'navigate'},respondWith:promise=>pending=promise});
+  const events=worker({fetch:async()=>{throw new Error('offline')},caches:{match:async key=>{assert.equal(key,'https://example.com/Bible-QSSE/index.html?v=10');return new Response('offline shell')}}});
+  events.fetch({request:{url:'https://example.com/Bible-QSSE/?v=10',method:'GET',mode:'navigate'},respondWith:promise=>pending=promise});
   assert.equal(await (await pending).text(),'offline shell');
 });
