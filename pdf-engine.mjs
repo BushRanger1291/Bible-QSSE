@@ -36,6 +36,7 @@ export async function extractText(bytes,progress=()=>{},signal) {
   } finally {await doc?.destroy()}
 }
 export const colors={yellow:[1,.85,.1],green:[.3,.9,.5],pink:[1,.35,.65]};
+function inkColor(value){const match=/^#([0-9a-f]{6})$/i.exec(value||'');if(!match)return rgb(.11,.31,.85);const number=parseInt(match[1],16);return rgb((number>>16)/255,((number>>8)&255)/255,(number&255)/255)}
 export function pdfRect(viewport,rect) {
   const a=viewport.convertToPdfPoint(rect[0],rect[1]),b=viewport.convertToPdfPoint(rect[2],rect[3]);
   return [Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[0],b[0]),Math.max(a[1],b[1])];
@@ -50,6 +51,8 @@ export async function exportAnnotated(bytes,annotations) {
       for(const rect of item.rects){
         page.drawRectangle({x:rect[0],y:rect[1],width:rect[2]-rect[0],height:rect[3]-rect[1],color:rgb(...(colors[item.color]||colors.yellow)),opacity:.35,blendMode:BlendMode.Multiply});
       }
+    } else if(item.type==='ink') {
+      for(let index=1;index<item.points.length;index++)page.drawLine({start:{x:item.points[index-1][0],y:item.points[index-1][1]},end:{x:item.points[index][0],y:item.points[index][1]},thickness:item.width||2,color:inkColor(item.color),opacity:.95});
     } else if(item.type==='note') {
       const [x,y]=item.point;
       page.drawRectangle({x,y:y-18,width:18,height:18,color:rgb(1,.8,.1),borderColor:rgb(.5,.3,0),borderWidth:.5});

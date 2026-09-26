@@ -29,7 +29,7 @@ test('PDF extraction preserves page numbers, accents folding and empty scanned p
 test('annotations export preserves source and produces visible highlights plus Unicode PDF notes',async()=>{
   await fixture();
   const before=await engine.fingerprint(bytes);
-  const edited=await engine.exportAnnotated(bytes,[{id:'highlight',type:'highlight',page:1,color:'yellow',rects:[[45,560,350,582]]},{id:'note',type:'note',page:1,point:[380,600],text:'À vérifier : évacuation. Contrôle QSSE.'}]);
+  const edited=await engine.exportAnnotated(bytes,[{id:'highlight',type:'highlight',page:1,color:'yellow',rects:[[45,560,350,582]]},{id:'ink',type:'ink',page:1,color:'#dc2626',width:4,points:[[45,520],[200,520]]},{id:'note',type:'note',page:1,point:[380,600],text:'À vérifier : évacuation. Contrôle QSSE.'}]);
   assert.equal(await engine.fingerprint(bytes),before);
   const doc=await engine.loadDocument(edited);
   try{
@@ -40,6 +40,7 @@ test('annotations export preserves source and produces visible highlights plus U
     await page.render({canvasContext:surface.getContext('2d'),viewport}).promise;
     const [r,g,b]=surface.getContext('2d').getImageData(340,108,1,1).data;
     assert.ok(r>240&&g>200&&b<220,'yellow highlight is visible');
+    const [ir,ig,ib]=surface.getContext('2d').getImageData(100,160,1,1).data;assert.ok(ir>150&&ig<100&&ib<100,'handwritten ink is visible');
   } finally {await doc.destroy()}
 });
 test('highlight coordinates survive page rotation and zoom',async()=>{
@@ -54,6 +55,7 @@ test('notes and text index survive reopening storage, and different libraries st
   const one=store();await one.saveAnnotations('same-file',[{type:'note',text:'Vérifier'}]);
   await one.saveText('library-A','plan.pdf',{size:40,lastModified:10},['Texte important']);
   const two=store();assert.equal((await two.annotations('same-file'))[0].text,'Vérifier');
+  const backup=await two.exportAnnotations();assert.ok(backup.some(record=>record.fingerprint==='same-file'));await two.mergeAnnotations([{fingerprint:'same-file',items:[{id:'ink-1',type:'ink',points:[[1,1],[2,2]]}]}]);assert.equal((await two.annotations('same-file')).length,2);
   assert.equal((await two.index('library-A')).get('plan.pdf').pages[0],'Texte important');assert.equal((await two.index('library-B')).size,0);
   const record=(await two.index('library-A')).get('plan.pdf');assert.equal(two.matches(record,{size:40,lastModified:10}),true);assert.equal(two.matches(record,{size:41,lastModified:10}),false);
 });
