@@ -1,0 +1,8 @@
+{
+  "name": "bible-qsse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bibliothèque QSSE locale avec annotations PDF",
+  "scripts": {"test": "node --test tests/*.test.cjs"},
+  "devDependencies": {"@napi-rs/canvas": "1.0.9", "fake-indexeddb": "6.2.5", "jsdom": "30.1.1"}
+}
