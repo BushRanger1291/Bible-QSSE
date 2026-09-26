@@ -1,7 +1,7 @@
 'use strict';
-const CACHE='bible-qsse-v7';
-const SHELL=new URL('./index.html?v=7',self.registration.scope).href;
-const ASSETS=['./index.html?v=7','./app.js?v=7','./bible-qsse-v7.webmanifest','./skull-192-v7.png','./skull-512-v7.png'];
+const CACHE='bible-qsse-v8';
+const SHELL=new URL('./index.html?v=8',self.registration.scope).href;
+const ASSETS=['./index.html?v=8','./app.js?v=8','./local-tags.js?v=8','./bible-qsse-v8.webmanifest','./skull-192-v7.png','./skull-512-v7.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS.map(path=>new Request(new URL(path,self.registration.scope),{cache:'reload'})))).then(()=>self.skipWaiting()));
 });

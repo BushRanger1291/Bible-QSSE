@@ -6,7 +6,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file));
 test('manifest points to valid PNG icons with the declared dimensions', () => {
-  const manifest = JSON.parse(read('bible-qsse-v7.webmanifest'));
+  const manifest = JSON.parse(read('bible-qsse-v8.webmanifest'));
   assert.equal(manifest.display, 'standalone');
   assert.equal(manifest.id, './');
   for (const icon of manifest.icons) {
@@ -41,13 +41,13 @@ test('install refreshes every shell asset, including both new icons', async () =
 });
 test('activation preserves other applications caches', async () => {
   const deleted=[];let pending;
-  const events=worker({caches:{keys:async()=>['bible-qsse-v4','bible-qsse-v6','bible-qsse-v7','orion-v1'],delete:async key=>deleted.push(key)}});
+  const events=worker({caches:{keys:async()=>['bible-qsse-v4','bible-qsse-v6','bible-qsse-v8','orion-v1'],delete:async key=>deleted.push(key)}});
   events.activate({waitUntil:promise=>pending=promise});await pending;
   assert.deepEqual(deleted,['bible-qsse-v4','bible-qsse-v6']);
 });
 test('offline navigation with a query string returns the cached application', async () => {
   let pending;
-  const events=worker({fetch:async()=>{throw new Error('offline')},caches:{match:async key=>{assert.equal(key,'https://example.com/Bible-QSSE/index.html?v=7');return new Response('offline shell')}}});
-  events.fetch({request:{url:'https://example.com/Bible-QSSE/?v=7',method:'GET',mode:'navigate'},respondWith:promise=>pending=promise});
+  const events=worker({fetch:async()=>{throw new Error('offline')},caches:{match:async key=>{assert.equal(key,'https://example.com/Bible-QSSE/index.html?v=8');return new Response('offline shell')}}});
+  events.fetch({request:{url:'https://example.com/Bible-QSSE/?v=8',method:'GET',mode:'navigate'},respondWith:promise=>pending=promise});
   assert.equal(await (await pending).text(),'offline shell');
 });
