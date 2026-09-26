@@ -9,7 +9,7 @@ Bibliothèque locale installable, conçue pour Chrome/Edge avec accès à un dos
 - **Tags** : ajoute plusieurs étiquettes par document et filtre la bibliothèque.
 - **Indexer le texte des PDF** : prépare la recherche dans leur contenu, sur cet appareil. À relancer après l’ajout ou la modification de fichiers. Un résultat indique la page et ouvre le lecteur à cet endroit.
 - **Ouvrir un PDF** : lit aussi un fichier isolé, sans sélectionner de dossier.
-- Dans le lecteur : sélectionne du texte puis **Surligner la sélection**, ou trace une **zone** avec le doigt/la souris. **Ajouter une note** permet de placer une note sur la page. Les annotations sont enregistrées automatiquement.
+- Dans le lecteur : active **Surligneur**, puis passe directement le doigt ou le stylet sur le texte. Tu peux aussi tracer une **zone** libre. **Ajouter une note** permet de placer une note sur la page. Les annotations sont enregistrées automatiquement.
 - **Exporter une copie annotée** : télécharge un nouveau PDF. Les surlignages sont intégrés visuellement à la copie ; les notes sont des annotations PDF standard, consultables dans un lecteur qui les prend en charge. L’original n’est pas réécrit.
 
 Les tags, annotations et textes indexés sont stockés dans le navigateur de l’appareil. Les effacer dans les réglages du navigateur les supprime ; les copies PDF exportées restent indépendantes. Pas de synchronisation entre appareils. Les annotations sont associées au contenu exact du fichier, afin de rester disponibles si celui-ci est renommé.
