@@ -56,5 +56,7 @@ window.BibleTags = (() => {
   async function save(library,path,tags) {
     await put('documents',{id:[library,path],library,path,tags});
   }
-  return {normalize,key,load,save};
+  async function exportTags(library){return (await records('documents','library',library)).map(({path,tags})=>({path,tags}))}
+  async function merge(library,items){const current=new Map((await records('documents','library',library)).map(record=>[record.path,record.tags]));for(const item of items||[]){if(typeof item.path!=='string'||!Array.isArray(item.tags))continue;await save(library,item.path,normalize([...(current.get(item.path)||[]),...item.tags].join(',')))}}
+  return {normalize,key,load,save,export:exportTags,merge};
 })();

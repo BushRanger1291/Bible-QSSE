@@ -25,7 +25,8 @@ test('a saved area annotation is rendered above the PDF page',async()=>{
   let source=fs.readFileSync(path.join(root,'pdf-viewer-v10.js'),'utf8');
   source=source.replace(/^  const engine=.*$/m,"  const engine=()=>Promise.resolve(window.__fakeEngine);");
   window.eval(source);
-  await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)});
+  await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)},{searchQuery:'incendie',searchPage:1});
+  assert.ok(window.document.querySelector('.pdfSearchHit'),'the matching text is temporarily identified');
   const mark=window.document.querySelector('.pdfMark');
   assert.ok(mark,'the stored annotation creates a mark element');
   assert.equal(mark.style.left,'45px');
@@ -36,7 +37,7 @@ test('a saved area annotation is rendered above the PDF page',async()=>{
   assert.equal(mark.parentElement.className,'pdfMarks');
   const pageNode=window.document.querySelector('.pdfPage'),draw=pageNode.querySelector('.pdfDraw');
   pageNode.getBoundingClientRect=draw.getBoundingClientRect=()=>({left:0,top:0,right:480,bottom:680,width:480,height:680});
-  const pointer=(name,x,y)=>{const event=new window.MouseEvent(name,{bubbles:true,cancelable:true,button:0,clientX:x,clientY:y});Object.defineProperty(event,'pointerId',{value:1});draw.dispatchEvent(event)};
+  const pointer=(name,x,y,type='pen')=>{const event=new window.MouseEvent(name,{bubbles:true,cancelable:true,button:0,clientX:x,clientY:y});Object.defineProperties(event,{pointerId:{value:1},pointerType:{value:type}});draw.dispatchEvent(event)};
   window.document.querySelector('#pdfHighlight').click();
   pointer('pointerdown',60,108);await new Promise(resolve=>setTimeout(resolve,0));
   pointer('pointermove',260,108);pointer('pointerup',310,108);
@@ -44,7 +45,14 @@ test('a saved area annotation is rendered above the PDF page',async()=>{
   assert.equal(saved.length,2,'the direct stroke is saved as a second annotation');
   assert.ok(saved[1].rects[0][2]>saved[1].rects[0][0]);
   assert.equal(window.document.querySelectorAll('.pdfMark').length,2,'the new annotation is immediately visible');
+  window.document.querySelector('#pdfPen').click();pointer('pointerdown',100,200,'touch');pointer('pointermove',140,220,'touch');pointer('pointerup',180,200,'touch');await new Promise(resolve=>setTimeout(resolve,0));assert.equal(saved.length,2,'a finger gesture does not create ink');pointer('pointerdown',100,200);await new Promise(resolve=>setTimeout(resolve,0));pointer('pointermove',140,220);pointer('pointermove',180,200);pointer('pointerup',210,230);
+  for(let i=0;i<20&&(saved.length<3||!window.document.querySelector('.pdfMarks polyline'));i++)await new Promise(resolve=>setTimeout(resolve,5));
+  assert.equal(saved[2].type,'ink');assert.ok(saved[2].points.length>=3);assert.ok(window.document.querySelector('.pdfMarks polyline'),'the S Pen stroke is visible');
+  window.document.querySelector('#pdfZoom').value='1.5';window.document.querySelector('#pdfZoom').dispatchEvent(new window.Event('change'));await new Promise(resolve=>setTimeout(resolve,20));assert.ok(window.document.querySelector('.pdfMarks polyline'),'the stroke survives zoom');
   await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)});
   assert.equal(window.document.querySelectorAll('.pdfMark').length,2,'both annotations remain visible after reopening');
+  assert.ok(window.document.querySelector('.pdfMarks polyline'),'the stroke remains visible after reopening');
+  const reopened=window.document.querySelector('.pdfPage'),eraser=reopened.querySelector('.pdfDraw');reopened.getBoundingClientRect=eraser.getBoundingClientRect=()=>({left:0,top:0,right:480,bottom:680,width:480,height:680});
+  const erase=(name,x,y)=>{const event=new window.MouseEvent(name,{bubbles:true,cancelable:true,button:0,clientX:x,clientY:y});Object.defineProperties(event,{pointerId:{value:2},pointerType:{value:'pen'}});eraser.dispatchEvent(event)};window.document.querySelector('#pdfEraser').click();erase('pointerdown',100,200);await new Promise(resolve=>setTimeout(resolve,0));erase('pointermove',150,210);erase('pointerup',190,210);for(let i=0;i<20&&saved.some(item=>item.type==='ink');i++)await new Promise(resolve=>setTimeout(resolve,5));assert.ok(!saved.some(item=>item.type==='ink'),'the software eraser removes the handwritten stroke');
   dom.window.close();
 });

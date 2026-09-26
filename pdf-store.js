@@ -33,11 +33,15 @@ window.PDFStore = (() => {
       tx.onerror=()=>reject(tx.error);
     });
   }
+  async function all(store){const database=await db();return new Promise((resolve,reject)=>{const request=database.transaction(store).objectStore(store).getAll();request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)})}
   return {
     annotations:async fingerprint=>(await read('annotations',fingerprint))?.items||[],
     saveAnnotations:(fingerprint,items)=>write('annotations',{fingerprint,items}),
     index:async library=>new Map((await read('text',library,'library')).map(record=>[record.path,record])),
     saveText:(library,path,file,pages)=>write('text',{id:[library,path],library,path,size:file.size,modified:file.lastModified,pages}),
+    removeText:async(library,path)=>{const database=await db();return new Promise((resolve,reject)=>{const tx=database.transaction('text','readwrite');tx.objectStore('text').delete([library,path]);tx.oncomplete=resolve;tx.onabort=()=>reject(tx.error);tx.onerror=()=>reject(tx.error)})},
+    exportAnnotations:()=>all('annotations'),
+    mergeAnnotations:async records=>{for(const source of records||[]){if(!source?.fingerprint||!Array.isArray(source.items))continue;const current=(await read('annotations',source.fingerprint))?.items||[],seen=new Set(current.map(item=>item.id||JSON.stringify(item))),merged=[...current];for(const item of source.items){const key=item.id||JSON.stringify(item);if(!seen.has(key)){seen.add(key);merged.push(item)}}await write('annotations',{fingerprint:source.fingerprint,items:merged})}},
     keepPaths:async(library,paths)=>{
       const database=await db();const keep=new Set(paths);
       return new Promise((resolve,reject)=>{
