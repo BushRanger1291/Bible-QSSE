@@ -1,3 +1,4 @@
+import './pdf-highlight-touch-v11.js';
 import * as pdfjs from './vendor/pdf.min.mjs';
 import {PDFDocument,PDFName,PDFHexString,PDFString,rgb,BlendMode,StandardFonts} from './vendor/pdf-lib.min.mjs';
 pdfjs.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdf.worker.min.mjs',import.meta.url).href;
