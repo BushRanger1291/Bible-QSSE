@@ -1,7 +1,7 @@
 'use strict';
-const CACHE='bible-qsse-v8';
-const SHELL=new URL('./index.html?v=8',self.registration.scope).href;
-const ASSETS=['./index.html?v=8','./app.js?v=8','./local-tags.js?v=8','./bible-qsse-v8.webmanifest','./skull-192-v7.png','./skull-512-v7.png'];
+const CACHE='bible-qsse-v9';
+const SHELL=new URL('./index.html?v=9',self.registration.scope).href;
+const ASSETS=["./index.html?v=9","./app.js?v=9","./local-tags.js?v=9","./pdf-store.js?v=9","./pdf-viewer.js?v=9","./pdf-viewer.css?v=9","./pdf-engine.mjs?v=9","./bible-qsse-v9.webmanifest","./skull-192-v7.png","./skull-512-v7.png","./vendor/pdf-lib.min.mjs","./vendor/pdf.min.mjs","./vendor/pdf.worker.min.mjs","./vendor/standard_fonts/FoxitDingbats.pfb","./vendor/standard_fonts/FoxitFixed.pfb","./vendor/standard_fonts/FoxitFixedBold.pfb","./vendor/standard_fonts/FoxitFixedBoldItalic.pfb","./vendor/standard_fonts/FoxitFixedItalic.pfb","./vendor/standard_fonts/FoxitSerif.pfb","./vendor/standard_fonts/FoxitSerifBold.pfb","./vendor/standard_fonts/FoxitSerifBoldItalic.pfb","./vendor/standard_fonts/FoxitSerifItalic.pfb","./vendor/standard_fonts/FoxitSymbol.pfb","./vendor/standard_fonts/LiberationSans-Bold.ttf","./vendor/standard_fonts/LiberationSans-BoldItalic.ttf","./vendor/standard_fonts/LiberationSans-Italic.ttf","./vendor/standard_fonts/LiberationSans-Regular.ttf","./vendor/text-layer.css"];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS.map(path=>new Request(new URL(path,self.registration.scope),{cache:'reload'})))).then(()=>self.skipWaiting()));
 });
