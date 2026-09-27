@@ -15,6 +15,7 @@ test('a saved area annotation is rendered above the PDF page',async()=>{
   window.HTMLDialogElement.prototype.showModal=function(){this.open=true};
   window.HTMLDialogElement.prototype.close=function(){this.open=false};
   window.HTMLCanvasElement.prototype.getContext=()=>({});
+  window.confirm=()=>true;
   window.HTMLElement.prototype.scrollIntoView=()=>{};
   window.HTMLElement.prototype.setPointerCapture=()=>{};
   window.IntersectionObserver=class{observe(){}disconnect(){}};
@@ -25,7 +26,7 @@ test('a saved area annotation is rendered above the PDF page',async()=>{
   let source=fs.readFileSync(path.join(root,'pdf-viewer-v10.js'),'utf8');
   source=source.replace(/^  const engine=.*$/m,"  const engine=()=>Promise.resolve(window.__fakeEngine);");
   window.eval(source);
-  await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)},{searchQuery:'incendie',searchPage:1});
+  await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)},{searchQuery:'incendie',searchPage:1,searchPages:['Prévention incendie puis contrôle incendie']});
   assert.ok(window.document.querySelector('.pdfSearchHit'),'the matching text is temporarily identified');
   const mark=window.document.querySelector('.pdfMark');
   assert.ok(mark,'the stored annotation creates a mark element');
@@ -35,6 +36,7 @@ test('a saved area annotation is rendered above the PDF page',async()=>{
   assert.equal(mark.style.height,'22px');
   assert.equal(mark.style.backgroundColor,'rgb(255, 224, 51)');
   assert.equal(mark.parentElement.className,'pdfMarks');
+  window.document.querySelector('#pdfFind').click();const searchInput=window.document.querySelector('#pdfSearchInput');searchInput.value='incendie';searchInput.dispatchEvent(new window.Event('input'));for(let i=0;i<40&&!window.document.querySelector('#pdfSearchCount').textContent.includes('/ 2');i++)await new Promise(resolve=>setTimeout(resolve,10));assert.equal(window.document.querySelector('#pdfSearchCount').textContent,'1 / 2','local PDF search counts occurrences');assert.ok(window.document.querySelector('.pdfSearchHit'),'local PDF search highlights the result temporarily');window.document.querySelector('#pdfSearchNext').click();await new Promise(resolve=>setTimeout(resolve,0));assert.equal(window.document.querySelector('#pdfSearchCount').textContent,'2 / 2','next navigates to the following occurrence');window.document.querySelector('#pdfSearchClose').click();assert.equal(window.document.querySelectorAll('.pdfSearchHit').length,0,'closing local search removes only temporary highlighting');assert.equal(saved.length,1,'local search never creates an annotation');
   assert.equal(window.document.querySelector('#pdfPen'),null,'the handwritten mode is removed from V16');
   assert.equal(window.document.querySelector('#pdfEraser'),null,'the handwritten eraser is removed from V16');
   const pageNode=window.document.querySelector('.pdfPage'),draw=pageNode.querySelector('.pdfDraw');
@@ -47,9 +49,12 @@ test('a saved area annotation is rendered above the PDF page',async()=>{
   assert.equal(saved.length,2,'the direct stroke is saved as a second annotation');
   assert.ok(saved[1].rects[0][2]>saved[1].rects[0][0]);
   assert.equal(window.document.querySelectorAll('.pdfMark').length,2,'the new annotation is immediately visible');
-  let requestedPage=0;await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)},{onCreateNote:({page})=>requestedPage=page});window.document.querySelector('#pdfNote').click();assert.equal(requestedPage,1,'+ Note captures the current PDF page without changing it');
+  let requestedPage=0,notes=[];await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)},{notes,onCreateNote:({page})=>requestedPage=page,onDeleteNote:async note=>notes=notes.filter(item=>item.id!==note.id)});const scroll=window.document.querySelector('#pdfScroll');scroll.scrollTop=237;scroll.scrollLeft=19;window.document.querySelector('#pdfNote').click();assert.equal(requestedPage,1,'+ Note captures the current PDF page without changing it');window.dispatchEvent(new window.Event('resize'));await new Promise(resolve=>setTimeout(resolve,300));assert.equal(scroll.scrollTop,237,'the Android keyboard resize does not rebuild or move the PDF while the note editor is open');notes=[{id:'note-1',title:'Travail de nuit',text:'Conditions applicables au personnel',documentKey:'demo',documentName:'demo.pdf',page:1,tags:['Planification']}];window.BiblePDF.finishNote(notes);assert.equal(scroll.scrollTop,237,'saving a note restores the exact PDF scroll position');assert.equal(window.document.querySelectorAll('.pdfMark').length,2,'creating a note does not remove highlights');assert.equal(window.document.querySelector('.pdfStructuredNote strong').textContent,'Travail de nuit','the structured note appears immediately in Annotations');assert.match(window.document.querySelector('.pdfStructuredNote').textContent,/Planification/);
   window.document.querySelector('#pdfZoom').value='1.5';window.document.querySelector('#pdfZoom').dispatchEvent(new window.Event('change'));await new Promise(resolve=>setTimeout(resolve,20));assert.equal(window.document.querySelectorAll('.pdfMark').length,2,'highlights survive zoom');
-  await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)});
+  await window.BiblePDF.open({name:'demo.pdf',arrayBuffer:async()=>new ArrayBuffer(8)},{notes,onDeleteNote:async note=>notes=notes.filter(item=>item.id!==note.id)});
   assert.equal(window.document.querySelectorAll('.pdfMark').length,2,'both annotations remain visible after reopening');
+  assert.equal(window.document.querySelectorAll('.pdfStructuredNote').length,1,'the structured note remains visible after reopening');
+  window.document.querySelector('.pdfStructuredNote button:last-child').click();await new Promise(resolve=>setTimeout(resolve,0));assert.equal(window.document.querySelectorAll('.pdfStructuredNote').length,0,'deleting a note removes it from Annotations');assert.equal(saved.length,2,'deleting a note never deletes a highlight');
+  notes=[{id:'note-2',title:'Note indépendante',text:'Toujours présente',documentKey:'demo',documentName:'demo.pdf',page:1,tags:[]}];window.BiblePDF.updateNotes(notes);const highlightEntry=[...window.document.querySelectorAll('#pdfAnnotations li')].find(item=>!item.classList.contains('pdfStructuredNote'));highlightEntry.querySelector('button:last-child').click();await new Promise(resolve=>setTimeout(resolve,0));assert.equal(saved.length,1,'deleting one highlight changes only PDF annotations');assert.equal(window.document.querySelectorAll('.pdfStructuredNote').length,1,'deleting a highlight never deletes a structured note');
   dom.window.close();
 });
