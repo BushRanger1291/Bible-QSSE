@@ -29,7 +29,7 @@ test('PDF extraction preserves page numbers, accents folding and empty scanned p
 test('annotations export preserves source and produces visible highlights plus Unicode PDF notes',async()=>{
   await fixture();
   const before=await engine.fingerprint(bytes);
-  const edited=await engine.exportAnnotated(bytes,[{id:'highlight',type:'highlight',page:1,color:'yellow',rects:[[45,560,350,582]]},{id:'ink',type:'ink',page:1,color:'#dc2626',width:4,points:[[45,520],[200,520]]},{id:'note',type:'note',page:1,point:[380,600],text:'À vérifier : évacuation. Contrôle QSSE.'}]);
+  const edited=await engine.exportAnnotated(bytes,[{id:'highlight',type:'highlight',page:1,color:'yellow',rects:[[45,560,350,582]]},{id:'ink',type:'ink',page:1,color:'#dc2626',width:4,strokes:[[[45,520],[200,520]],[[45,500],[120,490]]]},{id:'note',type:'note',page:1,point:[380,600],text:'À vérifier : évacuation. Contrôle QSSE.'}]);
   assert.equal(await engine.fingerprint(bytes),before);
   const doc=await engine.loadDocument(edited);
   try{

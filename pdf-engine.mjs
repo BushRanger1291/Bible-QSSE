@@ -52,7 +52,7 @@ export async function exportAnnotated(bytes,annotations) {
         page.drawRectangle({x:rect[0],y:rect[1],width:rect[2]-rect[0],height:rect[3]-rect[1],color:rgb(...(colors[item.color]||colors.yellow)),opacity:.35,blendMode:BlendMode.Multiply});
       }
     } else if(item.type==='ink') {
-      for(let index=1;index<item.points.length;index++)page.drawLine({start:{x:item.points[index-1][0],y:item.points[index-1][1]},end:{x:item.points[index][0],y:item.points[index][1]},thickness:item.width||2,color:inkColor(item.color),opacity:.95});
+      for(const stroke of item.strokes||[item.points||[]])for(let index=1;index<stroke.length;index++)page.drawLine({start:{x:stroke[index-1][0],y:stroke[index-1][1]},end:{x:stroke[index][0],y:stroke[index][1]},thickness:item.width||2,color:inkColor(item.color),opacity:.95});
     } else if(item.type==='note') {
       const [x,y]=item.point;
       page.drawRectangle({x,y:y-18,width:18,height:18,color:rgb(1,.8,.1),borderColor:rgb(.5,.3,0),borderWidth:.5});
