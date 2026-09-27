@@ -9,10 +9,13 @@ Bibliothèque locale installable, conçue pour Chrome/Edge avec accès à un dos
 - **Tags** : ajoute plusieurs étiquettes par document et filtre la bibliothèque.
 - **Catégories** : les huit dossiers physiques conservent leur identité couleur, y compris dans leurs sous-dossiers.
 - **Favoris et récents** : retrouve les documents marqués ou consultés récemment sans déplacer les fichiers.
+- **Filtrer les fichiers** : filtre immédiatement, par nom, le dossier courant et ses sous-dossiers. Le bouton **Rechercher dans le contenu** lance séparément la recherche plein texte.
+- **Tri** : classe les dossiers puis les documents par titre, taille, date de fichier ou dernière ouverture. Le choix est mémorisé.
+- **Sélection multiple** : un appui long sur un PDF permet d’en sélectionner plusieurs, puis de leur appliquer ensemble un favori ou un tag.
 - **Indexer le texte des PDF** : prépare la recherche dans leur contenu, sur cet appareil. À relancer après l’ajout ou la modification de fichiers. Un résultat indique la page et ouvre le lecteur à cet endroit.
 - **Ouvrir un PDF** : lit aussi un fichier isolé, sans sélectionner de dossier.
 - Dans le lecteur : active **Surligneur**, puis passe directement le doigt ou le stylet sur le texte. Tu peux aussi tracer une **zone** libre. **Ajouter une note** permet de placer une note sur la page. Les annotations sont enregistrées automatiquement.
-- **Stylet** : le S Pen permet d’écrire, entourer ou tracer directement sur la page ; le doigt continue à faire défiler. Trois épaisseurs, plusieurs couleurs, une gomme logicielle et Annuler sont disponibles.
+- **Stylet** : le S Pen permet d’écrire plusieurs traits successifs sans réactiver l’outil ; le doigt continue à faire défiler. La couleur et l’épaisseur sont mémorisées. La gomme retire le trait touché et Annuler reste disponible.
 - **Exporter une copie annotée** : télécharge un nouveau PDF. Les surlignages sont intégrés visuellement à la copie ; les notes sont des annotations PDF standard, consultables dans un lecteur qui les prend en charge. L’original n’est pas réécrit.
 - **Sauvegarder / Restaurer les données** : exporte un fichier JSON versionné avec les tags, favoris, récents, annotations et positions de lecture. Les PDF ne sont jamais inclus et une restauration fusionne les données.
 - **Supprimer** : les fichiers et les dossiers vides peuvent être supprimés après confirmation. Les catégories principales sont protégées et aucune suppression récursive n’est effectuée.
