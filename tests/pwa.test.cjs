@@ -40,8 +40,8 @@ test('install refreshes every shell asset, including the PDF reader candidate', 
     const filename = new URL(request.url).pathname.replace('/Bible-QSSE/','');
     assert.ok(fs.existsSync(path.join(root, filename)),filename);
   }
-  assert.ok(requests.some(request=>request.url.endsWith('pdf-viewer-v10.js?v=16')));
-  assert.ok(requests.some(request=>request.url.endsWith('library-meta.js?v=16')));
+  assert.ok(requests.some(request=>request.url.endsWith('pdf-viewer-v10.js?v=17')));
+  assert.ok(requests.some(request=>request.url.endsWith('library-meta.js?v=17')));
   assert.ok(!requests.some(request=>request.url.includes('pdf-highlight-touch-v11.js')));
   assert.ok(requests.some(request=>request.url.endsWith('skull-512-v7.png')));
 });
@@ -53,7 +53,7 @@ test('activation preserves other applications caches', async () => {
 });
 test('offline navigation with a query string returns the cached application', async () => {
   let pending;
-  const events=worker({fetch:async()=>{throw new Error('offline')},caches:{match:async key=>{assert.equal(key,'https://example.com/Bible-QSSE/index.html?v=16');return new Response('offline shell')}}});
-  events.fetch({request:{url:'https://example.com/Bible-QSSE/?v=16',method:'GET',mode:'navigate'},respondWith:promise=>pending=promise});
+  const events=worker({fetch:async()=>{throw new Error('offline')},caches:{match:async key=>{assert.equal(key,'https://example.com/Bible-QSSE/index.html?v=17');return new Response('offline shell')}}});
+  events.fetch({request:{url:'https://example.com/Bible-QSSE/?v=17',method:'GET',mode:'navigate'},respondWith:promise=>pending=promise});
   assert.equal(await (await pending).text(),'offline shell');
 });
