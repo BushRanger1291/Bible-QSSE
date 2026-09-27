@@ -17,6 +17,9 @@ test('manifest points to valid PNG icons with the declared dimensions', () => {
   assert.ok(manifest.icons.some(icon => icon.sizes === '192x192'));
   assert.ok(manifest.icons.some(icon => icon.sizes === '512x512'));
 });
+test('hidden contextual toolbars stay hidden despite toolbar display rules',()=>{
+  assert.match(read('index.html').toString(),/\[hidden\]\{display:none!important\}/);
+});
 function worker(overrides = {}) {
   const events = {};
   const scope = 'https://example.com/Bible-QSSE/';
