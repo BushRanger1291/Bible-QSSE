@@ -212,7 +212,7 @@ installButton.onclick=async()=>{
   catch(error){installHelp.showModal()}
 };
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js?v=14',{updateViaCache:'none'}).catch(()=>{
+  navigator.serviceWorker.register('sw.js?v=15',{updateViaCache:'none'}).catch(()=>{
     message('Le mode hors connexion n’est pas disponible. Recharge la page avec une connexion Internet.');
   });
 }
